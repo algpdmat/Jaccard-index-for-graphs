@@ -1,0 +1,41 @@
+# -*- coding: utf-8 -*-
+"""
+DataFrame processing and centrality correlation calculation.
+"""
+
+import pandas as pd
+import networkx as nx
+
+def calculate_centralities2(df, G):
+    """
+    Calculates centralities for the largest connected component of a graph and correlates them with DataFrame columns.
+
+    Parameters:
+    df (pandas.DataFrame): The input DataFrame.
+    G (networkx.Graph): The input graph.
+
+    Returns:
+    pandas.DataFrame: A DataFrame containing correlations of centralities with other columns.
+    """
+    largest_cc = max(nx.connected_components(G), key=len)
+    subgraph = G.subgraph(largest_cc).copy()
+
+    betw_centrality = nx.betweenness_centrality(subgraph)
+    deg_centrality = nx.degree_centrality(subgraph)
+    eig_centrality = nx.eigenvector_centrality(subgraph, max_iter=1000)
+
+    df['BC'] = pd.Series(betw_centrality)
+    df['DC'] = pd.Series(deg_centrality)
+    df['EC'] = pd.Series(eig_centrality)
+
+    bc_correlations = df.corr()['BC'].drop(['BC', 'DC', 'EC'])
+    dc_correlations = df.corr()['DC'].drop(['BC', 'DC', 'EC'])
+    ec_correlations = df.corr()['EC'].drop(['BC', 'DC', 'EC'])
+
+    correlations_df = pd.DataFrame({
+        'BC': bc_correlations,
+        'DC': dc_correlations,
+        'EC': ec_correlations
+    })
+
+    return correlations_df
