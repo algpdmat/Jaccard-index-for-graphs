@@ -1,0 +1,44 @@
+# -*- coding: utf-8 -*-
+"""
+Graph centrality calculations.
+"""
+
+import networkx as nx
+import seaborn as sns
+
+def calculate_centralities(graph):
+    """
+    Calculates various centralities for a given graph.
+
+    Parameters:
+    graph (networkx.Graph): The input graph.
+
+    Returns:
+    tuple: Lists of betweenness, degree, and eigenvector centralities.
+    """
+    betweenness_centrality = list(nx.betweenness_centrality(graph).values())
+    degree_centrality = list(nx.degree_centrality(graph).values())
+    eigenvector_centrality = list(nx.eigenvector_centrality(graph, max_iter=1000).values())
+
+    return betweenness_centrality, degree_centrality, eigenvector_centrality
+
+# -*- coding: utf-8 -*-
+"""
+Clustermap visualization.
+"""
+
+
+
+def plot_cluster_map(matrix):
+    """
+    Plots a cluster map using Seaborn.
+
+    Parameters:
+    matrix (2D array-like): A matrix of data to create the cluster map.
+
+    Returns:
+    seaborn.matrix.ClusterGrid: The resulting clustermap object.
+    """
+    sns.set_theme()
+    clustermap = sns.clustermap(matrix)
+    return clustermap
