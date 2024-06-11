@@ -1,0 +1,56 @@
+# -*- coding: utf-8 -*-
+"""
+Jaccard index calculation and 3D visualization.
+"""
+
+import matplotlib.pyplot as plt
+from matplotlib import cm
+
+def plot_jaccard_index(G, node_names, peak_threshold=0.8, valley_threshold=0.2):
+    """
+    Plots the Jaccard index for a given graph.
+
+    Parameters:
+    G (networkx.Graph): The graph for which Jaccard index is calculated.
+    node_names (list): List of node names.
+    peak_threshold (float): Threshold for highlighting peaks.
+    valley_threshold (float): Threshold for highlighting valleys.
+
+    Returns:
+    None
+    """
+    n = len(G.nodes())
+    matrix = np.zeros((n, n))
+
+    for i, u in enumerate(G.nodes()):
+        for j, v in enumerate(G.nodes()):
+            if u == v:
+                continue
+            common_neighbors = len(list(nx.common_neighbors(G, u, v)))
+            union_size = len(set(G[u]) | set(G[v]))
+            jaccard_index = common_neighbors / union_size if union_size else 0
+            matrix[i, j] = jaccard_index
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    x, y = np.meshgrid(range(n), range(n))
+    surf = ax.plot_surface(x, y, matrix, cmap=cm.coolwarm)
+
+    for i in range(n):
+        for j in range(n):
+            if matrix[i, j] >= peak_threshold:
+                ax.scatter(x[i, j], y[i, j], matrix[i, j], color='green', s=100)
+                ax.text(x[i, j], y[i, j], matrix[i, j], f'({node_names[i]},{node_names[j]})', fontsize=12)
+            elif matrix[i, j] <= valley_threshold:
+                ax.scatter(x[i, j], y[i, j], matrix[i, j], color='red', s=100)
+
+    fig.colorbar(surf, ax=ax, pad=0.2)
+    ax.set_zlabel('Jaccard Index')
+    ax.view_init(elev=20, azim=-45)
+    ax.set_xticks(range(n))
+    ax.set_xticklabels(node_names, rotation=90)
+    ax.set_yticks(range(n))
+    ax.set_yticklabels(node_names, rotation=90)
+
+    plt.title('Jaccard Index Visualization')
+    plt.show()
