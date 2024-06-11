@@ -1,0 +1,51 @@
+# -*- coding: utf-8 -*-
+"""
+Example script demonstrating the use of functions for similarity degree analysis.
+"""
+
+from classification import create_graph, calculate_centralities, calculate_centralities2
+from visualization import plot_jaccard_index, plot_cluster_map
+import pandas as pd
+import networkx as nx
+
+def main():
+    # Sample DataFrame
+    data = {
+        'PNASC': [3.1, 2.9, 3.0, 2.8],
+        'PESO': [20, 22, 21, 19],
+        'ALTURA': [120, 125, 123, 119],
+        'Circ. Cintura': [50, 52, 51, 49],
+        '%GC': [15, 14, 16, 15],
+        'Massa Gorda': [10, 11, 9, 10],
+        'Massa Magra': [50, 53, 51, 49],
+        'Província': ['Inhambane', 'Matola', 'Maputo', 'Vitoria2009']
+    }
+
+    df = pd.DataFrame(data)
+
+    # Example correlation matrix
+    correlation_matrix = df.corr().values
+
+    # Create graph with 0.3 density
+    graph = create_graph(correlation_matrix, 0.3)
+
+    # Calculate centralities
+    bet_centrality, deg_centrality, eig_centrality = calculate_centralities(graph)
+    print("Betweenness Centrality:", bet_centrality)
+    print("Degree Centrality:", deg_centrality)
+    print("Eigenvector Centrality:", eig_centrality)
+
+    # Plot Jaccard Index
+    node_names = ['A', 'B', 'C', 'D']
+    plot_jaccard_index(graph, node_names)
+
+    # Plot cluster map
+    plot_cluster_map(correlation_matrix)
+
+    # Calculate centralities and correlations
+    correlations_df = calculate_centralities2(df, graph)
+    print("Centrality Correlations:")
+    print(correlations_df)
+
+if __name__ == "__main__":
+    main()
