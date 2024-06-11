@@ -1,0 +1,38 @@
+# -*- coding: utf-8 -*-
+"""
+Graph creation and density calculation.
+"""
+
+import numpy as np
+import networkx as nx
+
+def create_graph(matrix, density, verbose=False):
+    """
+    Creates a NetworkX graph from a correlation matrix with a specified density.
+
+    Parameters:
+    matrix (numpy.ndarray): The correlation matrix.
+    density (float): Desired density for the graph.
+    verbose (bool): If True, prints the final graph density.
+
+    Returns:
+    NetworkX.Graph: The resulting graph.
+    """
+    np.fill_diagonal(matrix, 0)
+    temp = sorted(matrix.ravel(), reverse=True)
+    size = len(matrix)
+    cutoff = np.ceil(density * (size * (size - 1)))
+    threshold = temp[int(cutoff)]
+
+    G0 = nx.from_numpy_array(matrix)
+    G0.remove_edges_from(list(nx.selfloop_edges(G0)))
+    G1 = nx.Graph()
+    
+    for u, v, a in G0.edges(data=True):
+        if a.get('weight', 0) > threshold:
+            G1.add_edge(u, v, weight=a['weight'])
+
+    if verbose:
+        print(f"Final graph density: {nx.density(G1)}")
+
+    return G1
